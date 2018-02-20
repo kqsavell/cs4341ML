@@ -2,6 +2,17 @@ from keras.models import Sequential
 from keras.layers import Dense, Activation
 import numpy as np
 
+# Load and Flatten Data
+all_labels = np.load('labels.npy')  # Load in labels
+all_images = np.load('images.npy')  # Load in images
+flat_images = []
+
+i = 0
+while i < 6500:
+    temp = all_images[i].ravel()
+    flat_images.append(temp)
+    i += 1
+
 # Model Template
 
 model = Sequential() # declare model

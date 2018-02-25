@@ -10,6 +10,10 @@ from sklearn.metrics import confusion_matrix
 from sklearn.neighbors import KNeighborsClassifier
 import numpy as np
 
+# Symbolic Constants
+K_LOW = 5
+K_HIGH = 10
+
 # Load and Flatten Data
 all_labels = np.load('labels.npy')  # Load in labels, these being the "target"
 all_images = np.load('images.npy')  # Load in images, these being the "data"
@@ -80,6 +84,39 @@ class DecisionTreeClassification:
         return predict
 
 
+# K-Nearest Neighbors
+def k_nearest():
+    cur_k = K_LOW
+    best_k = 0
+    best_sum = 0
+
+    # Find best k value using validation set
+    while cur_k <= K_HIGH:
+        neigh = KNeighborsClassifier(n_neighbors=cur_k)
+        neigh.fit(training_set_i, training_set_l)
+        predicted_data = neigh.predict(validation_set_i)
+        cf = confusion_matrix(validation_set_l, predicted_data)
+        print(cf)
+        cur_val = 0
+        sum_correct = 0
+        while cur_val < 10:
+            sum_correct += cf[cur_val][cur_val]
+            cur_val += 1
+        if sum_correct > best_sum:
+            best_sum = sum_correct
+            best_k = cur_k
+        cur_k += 1
+
+    # Use best k on test set
+    print("Best k-value is "+str(best_k))
+    neigh = KNeighborsClassifier(n_neighbors=cur_k)
+    neigh.fit(training_set_i, training_set_l)
+    predicted_data = neigh.predict(test_set_i)
+    cf = confusion_matrix(test_set_l, predicted_data)
+    print(cf)
+    return cf
+
+
 # run the program
 def main():
     print("Starting...")
@@ -101,9 +138,7 @@ def main():
     print(confusion_matrix(training_set_l, dt.predict(training_set_i)))
 
     # K-Nearest Neighbors
-    neigh = KNeighborsClassifier(n_neighbors=3)
-    neigh.fit(training_set_i, training_set_l)
-    print(neigh.predict(test_set_i))
+    k_nearest()
 
 
 main()

@@ -14,29 +14,77 @@ import numpy as np
 K_LOW = 5
 K_HIGH = 10
 
+
+# Helper functions for feature creation
+def get_pixel_features(num_array):
+    """
+    Gets features for a given picture pixel array
+    :param num_array:
+    :return: an array of the features
+    """
+    array_length = len(num_array)
+    array_depth = len(num_array[0])
+    pixel_counter = 0
+    blank_pixel_counter = 0
+    highest_pixel_location = 999
+    lowest_pixel_location = 0
+    leftist_pixel_location = 999
+    rightmost_pixel_location = 0
+
+    for j in range(array_length):
+        for k in range(array_depth):
+            if num_array[j][k] > 0:
+                pixel_counter += 1
+                if k < highest_pixel_location:
+                    highest_pixel_location = k
+                if k > lowest_pixel_location:
+                    lowest_pixel_location = k
+                if j < leftist_pixel_location:
+                    leftist_pixel_location = j
+                if j > rightmost_pixel_location:
+                    rightmost_pixel_location = j
+
+            if num_array[j][k] == 0:
+                blank_pixel_counter += 1
+
+    return_array = [pixel_counter / 28*28, blank_pixel_counter, highest_pixel_location, lowest_pixel_location, leftist_pixel_location, rightmost_pixel_location]
+    print(return_array)
+    return return_array
+
+
 # Load and Flatten Data
 all_labels = np.load('labels.npy')  # Load in labels, these being the "target"
 all_images = np.load('images.npy')  # Load in images, these being the "data"
 flat_images = []
+features = []
 
 for image in all_images:
     temp = image.ravel()
     flat_images.append(temp)
+    # append to additional feature arrays
+    extra_features = get_pixel_features(image)
+    features.append(extra_features)
 
+print(len(features))
 # Create Training, Validation and Test Sets
 training_set_i, validation_set_i, test_set_i = [], [], []  # Image sets
+training_set_f, validation_set_f, test_set_f = [], [], []  # custom feature sets
 training_set_l, validation_set_l, test_set_l = [], [], []  # Label sets
 i = 0
+
 while i < 3900:
     training_set_i.append(flat_images[i])
+    training_set_f.append(features[i])
     training_set_l.append(all_labels[i])
     i += 1
 while i < 4875:
     validation_set_i.append(flat_images[i])
+    validation_set_f.append(features[i])
     validation_set_l.append(all_labels[i])
     i += 1
 while i < 6500:
     test_set_i.append(flat_images[i])
+    test_set_f.append(features[i])
     test_set_l.append(all_labels[i])
     i += 1
 
@@ -126,19 +174,37 @@ def main():
     #                       min_samples_leaf = 1, min_weight_fraction_leaf = 0.0, max_features = None,
     #                       random_state = None, max_leaf_nodes = None, min_impurity_decrease = 0.0,
     #                       min_impurity_split = None, class_weight = None, presort = False)
-    dt = DecisionTreeClassifier(max_depth=5, random_state=0)
+    print("Decision Tree Working on Full Pixel Data: ")
+    dt = DecisionTreeClassifier(max_depth=19, random_state=0, min_samples_leaf=1, )
     dt = DecisionTreeClassification(training_set_i, training_set_l, dt)
     dt.fit()
+
     print('Accuracy on the training subset: {:.3f}'.format(dt.score_accuracy(training_set_i, training_set_l)))
     print('Accuracy on the validation subset: {:.3f}'.format(dt.score_accuracy(validation_set_i, validation_set_l)))
     print('Accuracy on the test subset: {:.3f}'.format(dt.score_accuracy(test_set_i, test_set_l)))
     print('Accuracy score on prediction of test subset:{:.3f}'.format(accuracy_score(training_set_l,
                                                                       dt.predict(training_set_i))))
-    print('Confusion matrix on test subset:')
-    print(confusion_matrix(training_set_l, dt.predict(training_set_i)))
+    print('Confusion matrix on validation subset:')
+    print(confusion_matrix(validation_set_l, dt.predict(validation_set_i)))
+
+    print("Decision Tree Working on Hand-Engineered Features: ")
+    dt2 = DecisionTreeClassifier(max_depth=19, random_state=0, min_samples_leaf=1, )
+    dt2 = DecisionTreeClassification(training_set_f, training_set_l, dt2)
+    dt2.fit()
+
+    print('Accuracy on the training hand-engineered feature subset: {:.3f}'.format(dt2.score_accuracy(training_set_f,
+                                                                                                     training_set_l)))
+    print('Accuracy on the validation hand feature subset: {:.3f}'.format(dt2.score_accuracy(validation_set_f,
+                                                                                            validation_set_l)))
+    print('Accuracy on the test hand-engineered feature subset: {:.3f}'.format(dt2.score_accuracy(test_set_f,
+                                                                                                 test_set_l)))
+    print('Accuracy score on prediction of test hand feature subset:{:.3f}'.format(accuracy_score(training_set_l,
+                                                                                            dt2.predict(training_set_f))))
+    print('Confusion matrix on test hand-engineered feature subset:')
+    print(confusion_matrix(validation_set_l, dt2.predict(validation_set_f)))
 
     # K-Nearest Neighbors
-    k_nearest()
+    # k_nearest()
 
 
 main()

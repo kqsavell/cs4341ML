@@ -222,10 +222,8 @@ def main():
     print('Accuracy on the training subset: {:.3f}'.format(dt.score_accuracy(training_set_i, training_set_l)))
     print('Accuracy on the validation subset: {:.3f}'.format(dt.score_accuracy(validation_set_i, validation_set_l)))
     print('Accuracy on the test subset: {:.3f}'.format(dt.score_accuracy(test_set_i, test_set_l)))
-    print('Accuracy score on prediction of test subset:{:.3f}'.format(accuracy_score(training_set_l,
-                                                                      dt.predict(training_set_i))))
     print('Confusion matrix on validation subset:')
-    print(confusion_matrix(validation_set_l, dt.predict(validation_set_i)))
+    cf1 = confusion_matrix(validation_set_l, dt.predict(validation_set_i))
 
     print("Decision Tree Working on Hand-Engineered Features: ")
     dt2 = DecisionTreeClassifier(max_depth=19, random_state=0, min_samples_leaf=1, )
@@ -238,10 +236,9 @@ def main():
                                                                                             validation_set_l)))
     print('Accuracy on the test hand-engineered feature subset: {:.3f}'.format(dt2.score_accuracy(test_set_f,
                                                                                                  test_set_l)))
-    print('Accuracy score on prediction of test hand feature subset:{:.3f}'.format(accuracy_score(training_set_l,
-                                                                                            dt2.predict(training_set_f))))
     print('Confusion matrix on test hand-engineered feature subset:')
-    print(confusion_matrix(validation_set_l, dt2.predict(validation_set_f)))
+    cf2 = confusion_matrix(validation_set_l, dt2.predict(validation_set_f))
+
 
     # K-Nearest Neighbors
     cf = k_nearest()
@@ -249,12 +246,22 @@ def main():
     # Plot non-normalized confusion matrix
     plt.figure()
     plot_confusion_matrix(cf, classes=class_labels,
-                          title='Confusion matrix, without normalization')
+                          title='Confusion matrix for K-Nearest, without normalization')
 
     # Plot normalized confusion matrix
     plt.figure()
     plot_confusion_matrix(cf, classes=class_labels, normalize=True,
-                          title='Normalized confusion matrix')
+                          title='Normalized confusion matrix for K-Nearest')
+
+    # plot non-normalized confusion matrix for validation set for DT
+    plt.figure()
+    plot_confusion_matrix(cf1, classes=class_labels,
+                          title='Confusion matrix for DT, without normalization')
+
+    # plot normalized confusion matrix for validation set for DT
+    plt.figure()
+    plot_confusion_matrix(cf1, classes=class_labels, normalize=True,
+                          title='Confusion matrix for DT, without normalization')
 
     plt.show()
 

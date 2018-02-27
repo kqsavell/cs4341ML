@@ -11,6 +11,8 @@ from sklearn.neighbors import KNeighborsClassifier
 import matplotlib.pyplot as plt
 import numpy as np
 import itertools
+from PIL import Image
+import PIL.ImageOps
 
 # Symbolic Constants
 K_LOW = 5
@@ -239,7 +241,6 @@ def main():
     print('Confusion matrix on test hand-engineered feature subset:')
     cf2 = confusion_matrix(validation_set_l, dt2.predict(validation_set_f))
 
-
     # K-Nearest Neighbors
     cf = k_nearest()
     class_labels = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
@@ -265,5 +266,10 @@ def main():
 
     plt.show()
 
+
+# Image printing example:
+# img1 = Image.fromarray(all_images[4875 + 70], "L")
+# img1_inv = PIL.ImageOps.invert(img1)
+# img1_inv.show()
 
 main()

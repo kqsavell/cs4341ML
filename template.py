@@ -262,7 +262,7 @@ def main():
     # plot normalized confusion matrix for validation set for DT
     plt.figure()
     plot_confusion_matrix(cf1, classes=class_labels, normalize=True,
-                          title='Confusion matrix for DT, without normalization')
+                          title='Confusion matrix for DT, with normalization')
 
     plt.show()
 

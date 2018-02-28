@@ -2,6 +2,7 @@
 
 from keras.models import Sequential
 from keras.layers import Dense, Activation
+from keras.utils import np_utils
 from sklearn.model_selection import train_test_split
 import graphviz
 from sklearn.tree import DecisionTreeClassifier
@@ -17,6 +18,95 @@ import PIL.ImageOps
 # Symbolic Constants
 K_LOW = 5
 K_HIGH = 10
+
+
+def neural_network():
+    model = Sequential()  # declare model
+    model.add(Dense(10, input_shape=(28 * 28,), kernel_initializer='he_normal'))  # first layer
+    model.add(Activation('relu'))
+    #
+    #
+    model.add(Dense(12, activation='relu'))
+    model.add(Dense(12, activation='relu'))
+    model.add(Dense(12, activation='relu'))
+    # Fill in Model Here
+    #
+    #
+    model.add(Dense(10, kernel_initializer='he_normal'))  # last layer
+    model.add(Activation('softmax'))
+
+    # Compile Model
+    model.compile(optimizer='sgd',
+                  loss='categorical_crossentropy',
+                  metrics=['accuracy'])
+
+    #    training_set_x = np.zeros(shape=(784, 3900))image data input to keras model.fit
+    #    training_set_y = np.zeros(shape=(10, 3900))
+    #    validation_set_x = np.zeros(shape=(784, 975))
+    #    validation_set_y = np.zeros(shape=(10, 975))
+
+    #   for image in training_set_i:
+    #            training_set_x = training_set_x + image
+    #    for image in training_set_l:
+    #            training_set_y = training_set_y + image
+    #    for image in validation_set_i:
+    #            validation_set_x = validation_set_x + image
+    #    for image in validation_set_l:
+    #            validation_set_y = validation_set_y + image
+
+    split_np_x = np.split(all_images, [3900, 6500])
+    split_np_y = np.split(all_labels, [3900, 6500])
+
+    train_set_x = split_np_x[0]
+    test_set_x = split_np_x[1]
+    train_set_y = split_np_y[0]
+    test_set_y = split_np_y[1]
+
+    num_pixels = train_set_x.shape[1] * train_set_x.shape[2]
+    x_train = train_set_x.reshape(train_set_x.shape[0], num_pixels).astype('int')
+    y_train = np_utils.to_categorical(train_set_y)
+
+    num_pixels = test_set_x.shape[1] * test_set_x.shape[2]
+    x_test = test_set_x.reshape(test_set_x.shape[0], num_pixels).astype('int')
+    y_test = np_utils.to_categorical(test_set_y)
+
+    # Train Model
+    history = model.fit(x_train, y_train,
+                        validation_split=0.20,
+                        #                       validation_data = (validation_set_i, validation_set_l),
+                        epochs=1500,
+                        batch_size=256)
+
+    # Report Results
+    print(history.history)
+
+    # Confusion Matrix
+    ann_np = model.predict(x_test, 256, 0, None)
+    print(len(ann_np))
+    print(len(test_set_y))
+    ann_classes = ann_np.argmax(axis=-1)
+    ann_cf = confusion_matrix(test_set_y.tolist(), ann_classes.tolist())
+
+    # plot non-normalized confusion matrix for validation set for DT
+    class_labels = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+    plt.figure()
+    plot_confusion_matrix(ann_cf, classes=class_labels,
+                          title='Confusion matrix for ANN, without normalization')
+    plt.figure()
+    plot_confusion_matrix(ann_cf, classes=class_labels, normalize=True,
+                          title='Confusion matrix for ANN, with normalization')
+
+    plt.show()
+
+    # summarize history for accuracy
+    plt.plot(history.history['acc'])
+    plt.plot(history.history['val_acc'])
+    plt.title('model accuracy')
+    plt.ylabel('accuracy')
+    plt.xlabel('epoch')
+    plt.legend(['train', 'test'], loc='upper left')
+    plt.show()
+    model.predict(x_test)
 
 
 # Helper functions for feature creation
@@ -213,6 +303,10 @@ def k_nearest():
 def main():
     print("Starting...")
 
+    # Neural Network
+    print("Artificial Neural Network on Full Pixel Data: ")
+    neural_network()
+
     # Decision Tree
     # DecisionTreeClassifier(criterion=’gini’, splitter =’best’, max_depth = None, min_samples_split = 2,
     #                       min_samples_leaf = 1, min_weight_fraction_leaf = 0.0, max_features = None,
@@ -268,5 +362,10 @@ def main():
                           title='Confusion matrix for variation DT, with normalization')
 
     plt.show()
+
+# Sample code for converting array to image
+# img1 = Image.fromarray(all_images[4875 + 70], "L")
+# img1_inv = PIL.ImageOps.invert(img1)
+# img1_inv.show()
 
 main()

@@ -217,7 +217,7 @@ def main():
     #                       random_state = None, max_leaf_nodes = None, min_impurity_decrease = 0.0,
     #                       min_impurity_split = None, class_weight = None, presort = False)
     print("Decision Tree Working on Full Pixel Data: ")
-    dt = DecisionTreeClassifier(max_depth=19, random_state=0, min_samples_leaf=1, )
+    dt = DecisionTreeClassifier(max_depth=19, min_samples_leaf=1, splitter="best", random_state=None, criterion="entropy")
     dt = DecisionTreeClassification(training_set_i, training_set_l, dt)
     dt.fit()
 
@@ -242,27 +242,27 @@ def main():
     cf2 = confusion_matrix(validation_set_l, dt2.predict(validation_set_f))
 
     # K-Nearest Neighbors
-    cf = k_nearest()
+    # cf = k_nearest()
     class_labels = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
-    # Plot non-normalized confusion matrix
-    plt.figure()
-    plot_confusion_matrix(cf, classes=class_labels,
-                          title='Confusion matrix for K-Nearest, without normalization')
-
-    # Plot normalized confusion matrix
-    plt.figure()
-    plot_confusion_matrix(cf, classes=class_labels, normalize=True,
-                          title='Normalized confusion matrix for K-Nearest')
-
+    # # Plot non-normalized confusion matrix
+    # plt.figure()
+    # plot_confusion_matrix(cf, classes=class_labels,
+    #                       title='Confusion matrix for K-Nearest, without normalization')
+    #
+    # # Plot normalized confusion matrix
+    # plt.figure()
+    # plot_confusion_matrix(cf, classes=class_labels, normalize=True,
+    #                       title='Normalized confusion matrix for K-Nearest')
+    #
     # plot non-normalized confusion matrix for validation set for DT
     plt.figure()
     plot_confusion_matrix(cf1, classes=class_labels,
-                          title='Confusion matrix for DT, without normalization')
+                          title='Confusion matrix for variation DT, without normalization')
 
     # plot normalized confusion matrix for validation set for DT
     plt.figure()
     plot_confusion_matrix(cf1, classes=class_labels, normalize=True,
-                          title='Confusion matrix for DT, with normalization')
+                          title='Confusion matrix for variation DT, with normalization')
 
     plt.show()
 

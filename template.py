@@ -186,7 +186,9 @@ def k_nearest():
         neigh.fit(training_set_i, training_set_l)
         predicted_data = neigh.predict(validation_set_i)
         cf = confusion_matrix(validation_set_l, predicted_data)
+        print("k = "+str(cur_k))
         print(cf)
+        print("\n")
         cur_val = 0
         sum_correct = 0
         while cur_val < 10:
@@ -242,7 +244,8 @@ def main():
     cf2 = confusion_matrix(validation_set_l, dt2.predict(validation_set_f))
 
     # K-Nearest Neighbors
-    # cf = k_nearest()
+    print("K-nearest on all pixel-data")
+    cf = k_nearest()
     class_labels = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
     # # Plot non-normalized confusion matrix
     # plt.figure()
@@ -265,11 +268,5 @@ def main():
                           title='Confusion matrix for variation DT, with normalization')
 
     plt.show()
-
-
-# Image printing example:
-# img1 = Image.fromarray(all_images[4875 + 70], "L")
-# img1_inv = PIL.ImageOps.invert(img1)
-# img1_inv.show()
 
 main()

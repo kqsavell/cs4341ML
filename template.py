@@ -3,10 +3,7 @@
 from keras.models import Sequential
 from keras.layers import Dense, Activation
 from keras.utils import np_utils
-from sklearn.model_selection import train_test_split
-import graphviz
 from sklearn.tree import DecisionTreeClassifier
-from sklearn.metrics import accuracy_score
 from sklearn.metrics import confusion_matrix
 from sklearn.neighbors import KNeighborsClassifier
 import matplotlib.pyplot as plt
@@ -21,17 +18,14 @@ K_HIGH = 10
 
 
 def neural_network():
-    model = Sequential()  # declare model
+
+    # Declare Model
+    model = Sequential()
     model.add(Dense(10, input_shape=(28 * 28,), kernel_initializer='he_normal'))  # first layer
     model.add(Activation('relu'))
-    #
-    #
     model.add(Dense(12, activation='relu'))
     model.add(Dense(12, activation='relu'))
     model.add(Dense(12, activation='relu'))
-    # Fill in Model Here
-    #
-    #
     model.add(Dense(10, kernel_initializer='he_normal'))  # last layer
     model.add(Activation('softmax'))
 
@@ -39,20 +33,6 @@ def neural_network():
     model.compile(optimizer='sgd',
                   loss='categorical_crossentropy',
                   metrics=['accuracy'])
-
-    #    training_set_x = np.zeros(shape=(784, 3900))image data input to keras model.fit
-    #    training_set_y = np.zeros(shape=(10, 3900))
-    #    validation_set_x = np.zeros(shape=(784, 975))
-    #    validation_set_y = np.zeros(shape=(10, 975))
-
-    #   for image in training_set_i:
-    #            training_set_x = training_set_x + image
-    #    for image in training_set_l:
-    #            training_set_y = training_set_y + image
-    #    for image in validation_set_i:
-    #            validation_set_x = validation_set_x + image
-    #    for image in validation_set_l:
-    #            validation_set_y = validation_set_y + image
 
     split_np_x = np.split(all_images, [3900, 6500])
     split_np_y = np.split(all_labels, [3900, 6500])
@@ -86,8 +66,6 @@ def neural_network():
     print(len(test_set_y))
     ann_classes = ann_np.argmax(axis=-1)
     ann_cf = confusion_matrix(test_set_y.tolist(), ann_classes.tolist())
-
-    # plot non-normalized confusion matrix for validation set for DT
     class_labels = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
     plt.figure()
     plot_confusion_matrix(ann_cf, classes=class_labels,
@@ -95,10 +73,9 @@ def neural_network():
     plt.figure()
     plot_confusion_matrix(ann_cf, classes=class_labels, normalize=True,
                           title='Confusion matrix for ANN, with normalization')
-
     plt.show()
 
-    # summarize history for accuracy
+    # Summarize history for accuracy
     plt.plot(history.history['acc'])
     plt.plot(history.history['val_acc'])
     plt.title('model accuracy')
@@ -299,7 +276,7 @@ def k_nearest():
     return cf
 
 
-# run the program
+# Run the program
 def main():
     print("Starting...")
 
@@ -308,10 +285,6 @@ def main():
     neural_network()
 
     # Decision Tree
-    # DecisionTreeClassifier(criterion=’gini’, splitter =’best’, max_depth = None, min_samples_split = 2,
-    #                       min_samples_leaf = 1, min_weight_fraction_leaf = 0.0, max_features = None,
-    #                       random_state = None, max_leaf_nodes = None, min_impurity_decrease = 0.0,
-    #                       min_impurity_split = None, class_weight = None, presort = False)
     print("Decision Tree Working on Full Pixel Data: ")
     dt = DecisionTreeClassifier(max_depth=19, min_samples_leaf=1, splitter="best", random_state=None, criterion="entropy")
     dt = DecisionTreeClassification(training_set_i, training_set_l, dt)
@@ -329,11 +302,11 @@ def main():
     dt2.fit()
 
     print('Accuracy on the training hand-engineered feature subset: {:.3f}'.format(dt2.score_accuracy(training_set_f,
-                                                                                                     training_set_l)))
+                                                                                                      training_set_l)))
     print('Accuracy on the validation hand feature subset: {:.3f}'.format(dt2.score_accuracy(validation_set_f,
-                                                                                            validation_set_l)))
+                                                                                             validation_set_l)))
     print('Accuracy on the test hand-engineered feature subset: {:.3f}'.format(dt2.score_accuracy(test_set_f,
-                                                                                                 test_set_l)))
+                                                                                                  test_set_l)))
     print('Confusion matrix on test hand-engineered feature subset:')
     cf2 = confusion_matrix(validation_set_l, dt2.predict(validation_set_f))
 
@@ -341,16 +314,17 @@ def main():
     print("K-nearest on all pixel-data")
     cf = k_nearest()
     class_labels = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
-    # # Plot non-normalized confusion matrix
-    # plt.figure()
-    # plot_confusion_matrix(cf, classes=class_labels,
-    #                       title='Confusion matrix for K-Nearest, without normalization')
-    #
-    # # Plot normalized confusion matrix
-    # plt.figure()
-    # plot_confusion_matrix(cf, classes=class_labels, normalize=True,
-    #                       title='Normalized confusion matrix for K-Nearest')
-    #
+
+    # Plot non-normalized confusion matrix for k-nearest
+    plt.figure()
+    plot_confusion_matrix(cf, classes=class_labels,
+                          title='Confusion matrix for K-Nearest, without normalization')
+
+    # Plot normalized confusion matrix for k-nearest
+    plt.figure()
+    plot_confusion_matrix(cf, classes=class_labels, normalize=True,
+                          title='Normalized confusion matrix for K-Nearest')
+
     # plot non-normalized confusion matrix for validation set for DT
     plt.figure()
     plot_confusion_matrix(cf1, classes=class_labels,
